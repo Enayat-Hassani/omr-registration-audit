@@ -1,0 +1,189 @@
+============================================================================================================
+                            OMRBench -- PER-GENERATOR OPERATING CHARACTERISTICS                             
+============================================================================================================
+12 sheets per (generator x injector) cell. Every detector sees IDENTICAL sheets.
+Results are NEVER pooled across generators: a single averaged number hides
+exactly the conditions under which a method fails.
+
+  FPR    false-alarm rate on error-free sheets       (lower is better)
+  POW    power, over all injected error types        (higher is better)
+  AWARD  mean marks WRONGLY AWARDED per sheet        (harms integrity)
+  AW@BR  the same, reweighted to a 1.8% base rate of errors
+  REC    share of lost marks RETURNED vs the no-op    (higher is better)
+  HOLD   mean marks WRONGLY WITHHELD per sheet       (harms the candidate)
+  LOC    median localisation error, questions        (lower is better)
+  CMP    decision-schema completeness, 0-1           (transparency)
+  BRIER  comparative confidence metric               (lower is better)
+  ECE    expected calibration error, comparative     (lower is better)
+
+  All sheets below are SYNTHETIC. Nothing here is a confirmed historical
+  case, so none of it establishes operational performance.
+
+  BRIER and ECE rank detectors on identical data. They do NOT establish
+  deployment calibration: these cells hold three error sheets per
+  error-free sheet, while the reported confidence uses a 1.8% base rate
+  as its prior. A base-rate-thresholded posterior cannot be validated on
+  a test set whose base rate is 75%.
+
+  Each FPR below is over 12 error-free sheets. An observed 0.000
+  bounds the true rate below 22.1% at 95% confidence
+  (Clopper-Pearson, exact). Zero observed is not zero risk.
+
+------------------------------------------------------------------------------------------------------------
+GENERATOR: adversarial_adaptable
+  Skiena & Sumazin's maximum-adaptability string L=(01101001)*, mapped to 4 options
+  violates: deliberately engineered to farm generous shift correction
+------------------------------------------------------------------------------------------------------------
+  n = 12 error-free and 36 error sheets per detector in this cell.
+  detector                         FPR   (fp/n)     POW    (d/n)   AWARD   AW@BR    HOLD   LOC   BRIER
+  no-op (never correct)          0.000   (0/12)   0.000   (0/36)    1.10   0.026    0.98     -   0.750
+  brute-force shift              0.417   (5/12)   0.444  (16/36)    3.31   2.357    0.23    16   0.447
+  LCS (maximally generous)       1.000  (12/12)   1.000  (36/36)   14.65  13.609    0.00     -       -
+  fixed-cost DP alignment        1.000  (12/12)   0.889  (32/36)    7.31   7.089    0.00     8       -
+  gated pair-HMM (reference)     0.000   (0/12)   0.000   (0/36)    1.10   0.026    0.98     -   0.277
+
+------------------------------------------------------------------------------------------------------------
+GENERATOR: attractive_distractor
+  one distractor per item takes 65% of the wrong answers
+  violates: A2: wrong answers spread uniformly over distractors
+------------------------------------------------------------------------------------------------------------
+  n = 12 error-free and 36 error sheets per detector in this cell.
+  detector                         FPR   (fp/n)     POW    (d/n)   AWARD   AW@BR    HOLD   LOC   BRIER
+  no-op (never correct)          0.000   (0/12)   0.000   (0/36)    0.00   0.000   11.79     -   0.750
+  brute-force shift              0.000   (0/12)   0.556  (20/36)    0.00   0.000    8.00    14   0.401
+  LCS (maximally generous)       0.417   (5/12)   1.000  (36/36)    1.04   0.676    0.00     -       -
+  fixed-cost DP alignment        0.000   (0/12)   1.000  (36/36)    0.21   0.005    0.00     0       -
+  gated pair-HMM (reference)     0.000   (0/12)   0.389  (14/36)    0.00   0.000    7.52     0   0.000
+
+------------------------------------------------------------------------------------------------------------
+GENERATOR: clean
+  constant ability, uniform distractors, independent items
+  violates: nothing -- this is the detector's own model
+------------------------------------------------------------------------------------------------------------
+  n = 12 error-free and 36 error sheets per detector in this cell.
+  detector                         FPR   (fp/n)     POW    (d/n)   AWARD   AW@BR    HOLD   LOC   BRIER
+  no-op (never correct)          0.000   (0/12)   0.000   (0/36)    0.00   0.000   12.04     -   0.750
+  brute-force shift              0.000   (0/12)   0.528  (19/36)    0.00   0.000    8.10    11   0.384
+  LCS (maximally generous)       0.500   (6/12)   1.000  (36/36)    0.81   0.670    0.00     -       -
+  fixed-cost DP alignment        0.000   (0/12)   1.000  (36/36)    0.10   0.003    0.00     0       -
+  gated pair-HMM (reference)     0.000   (0/12)   0.389  (14/36)    0.00   0.000    8.21     0   0.000
+
+------------------------------------------------------------------------------------------------------------
+GENERATOR: irt_2pl
+  item difficulty and discrimination vary (2PL)
+  violates: A1: items are exchangeable given ability
+------------------------------------------------------------------------------------------------------------
+  n = 12 error-free and 36 error sheets per detector in this cell.
+  detector                         FPR   (fp/n)     POW    (d/n)   AWARD   AW@BR    HOLD   LOC   BRIER
+  no-op (never correct)          0.000   (0/12)   0.000   (0/36)    0.00   0.000   11.15     -   0.750
+  brute-force shift              0.000   (0/12)   0.528  (19/36)    0.00   0.000    7.02    12   0.390
+  LCS (maximally generous)       0.583   (7/12)   1.000  (36/36)    1.19   0.760    0.00     -       -
+  fixed-cost DP alignment        0.000   (0/12)   1.000  (36/36)    0.15   0.003    0.02     0       -
+  gated pair-HMM (reference)     0.000   (0/12)   0.472  (17/36)    0.00   0.000    6.96     0   0.000
+
+------------------------------------------------------------------------------------------------------------
+GENERATOR: nonstationary_ability
+  ability drifts downward across the paper (fatigue / time pressure)
+  violates: A3: a single ability applies across the whole paper
+------------------------------------------------------------------------------------------------------------
+  n = 12 error-free and 36 error sheets per detector in this cell.
+  detector                         FPR   (fp/n)     POW    (d/n)   AWARD   AW@BR    HOLD   LOC   BRIER
+  no-op (never correct)          0.000   (0/12)   0.000   (0/36)    0.00   0.000    7.12     -   0.750
+  brute-force shift              0.000   (0/12)   0.250   (9/36)    0.00   0.000    5.96    11   0.587
+  LCS (maximally generous)       1.000  (12/12)   1.000  (36/36)    3.85   3.915    0.00     -       -
+  fixed-cost DP alignment        0.167   (2/12)   0.972  (35/36)    0.79   0.751    0.10     0       -
+  gated pair-HMM (reference)     0.000   (0/12)   0.167   (6/36)    0.00   0.000    6.15     0   0.020
+
+------------------------------------------------------------------------------------------------------------
+GENERATOR: option_bias
+  when unsure, always picks the same option
+  violates: A2, and inflates accidental alignment with key-heavy stretches
+------------------------------------------------------------------------------------------------------------
+  n = 12 error-free and 36 error sheets per detector in this cell.
+  detector                         FPR   (fp/n)     POW    (d/n)   AWARD   AW@BR    HOLD   LOC   BRIER
+  no-op (never correct)          0.000   (0/12)   0.000   (0/36)    0.00   0.000   12.35     -   0.750
+  brute-force shift              0.000   (0/12)   0.472  (17/36)    0.00   0.000    8.25    10   0.390
+  LCS (maximally generous)       0.250   (3/12)   1.000  (36/36)    0.42   0.254    0.00     -       -
+  fixed-cost DP alignment        0.000   (0/12)   1.000  (36/36)    0.10   0.003    0.06     0       -
+  gated pair-HMM (reference)     0.000   (0/12)   0.528  (19/36)    0.00   0.000    7.33     0   0.000
+
+------------------------------------------------------------------------------------------------------------
+GENERATOR: streaky_guesser
+  guesses in long runs of the same option throughout
+  violates: independence of successive responses
+------------------------------------------------------------------------------------------------------------
+  n = 12 error-free and 36 error sheets per detector in this cell.
+  detector                         FPR   (fp/n)     POW    (d/n)   AWARD   AW@BR    HOLD   LOC   BRIER
+  no-op (never correct)          0.000   (0/12)   0.000   (0/36)    0.44   0.011    0.67     -   0.750
+  brute-force shift              0.000   (0/12)   0.222   (8/36)    1.06   0.025    0.38    26   0.499
+  LCS (maximally generous)       1.000  (12/12)   1.000  (36/36)   10.54  10.176    0.00     -       -
+  fixed-cost DP alignment        0.417   (5/12)   0.611  (22/36)    3.08   2.107    0.10     6       -
+  gated pair-HMM (reference)     0.000   (0/12)   0.000   (0/36)    0.44   0.011    0.67     -   0.260
+
+------------------------------------------------------------------------------------------------------------
+GENERATOR: time_truncated
+  runs out of time and bubbles a fixed pattern for the tail
+  violates: the response model entirely, for part of the sheet
+------------------------------------------------------------------------------------------------------------
+  n = 12 error-free and 36 error sheets per detector in this cell.
+  detector                         FPR   (fp/n)     POW    (d/n)   AWARD   AW@BR    HOLD   LOC   BRIER
+  no-op (never correct)          0.000   (0/12)   0.000   (0/36)    0.08   0.002    6.69     -   0.750
+  brute-force shift              0.000   (0/12)   0.417  (15/36)    0.08   0.002    4.23     9   0.475
+  LCS (maximally generous)       0.333   (4/12)   0.944  (34/36)    1.23   0.436    0.00     -       -
+  fixed-cost DP alignment        0.000   (0/12)   0.750  (27/36)    0.48   0.011    0.10     0       -
+  gated pair-HMM (reference)     0.000   (0/12)   0.444  (16/36)    0.08   0.002    3.42     0   0.136
+
+------------------------------------------------------------------------------------------------------------
+GENERATOR: topic_clustered
+  items grouped by topic in blocks of 5; difficulty correlated within block
+  violates: A1: conditional independence of items
+------------------------------------------------------------------------------------------------------------
+  n = 12 error-free and 36 error sheets per detector in this cell.
+  detector                         FPR   (fp/n)     POW    (d/n)   AWARD   AW@BR    HOLD   LOC   BRIER
+  no-op (never correct)          0.000   (0/12)   0.000   (0/36)    0.00   0.000   10.15     -   0.750
+  brute-force shift              0.000   (0/12)   0.389  (14/36)    0.00   0.000    7.17    11   0.467
+  LCS (maximally generous)       0.667   (8/12)   1.000  (36/36)    1.58   1.095    0.00     -       -
+  fixed-cost DP alignment        0.000   (0/12)   1.000  (36/36)    0.35   0.008    0.04     0       -
+  gated pair-HMM (reference)     0.000   (0/12)   0.389  (14/36)    0.00   0.000    6.96     1   0.000
+
+------------------------------------------------------------------------------------------------------------
+GENERATOR: two_regime
+  strong on the first half, collapses on the second
+  violates: A3, and MIMICS a shift boundary -- the hardest confound
+------------------------------------------------------------------------------------------------------------
+  n = 12 error-free and 36 error sheets per detector in this cell.
+  detector                         FPR   (fp/n)     POW    (d/n)   AWARD   AW@BR    HOLD   LOC   BRIER
+  no-op (never correct)          0.000   (0/12)   0.000   (0/36)    0.27   0.006    4.35     -   0.750
+  brute-force shift              0.000   (0/12)   0.139   (5/36)    0.27   0.006    3.62     8   0.611
+  LCS (maximally generous)       0.917  (11/12)   1.000  (36/36)    6.75   5.286    0.00     -       -
+  fixed-cost DP alignment        0.167   (2/12)   0.778  (28/36)    2.06   0.863    0.12     0       -
+  gated pair-HMM (reference)     0.000   (0/12)   0.139   (5/36)    0.27   0.006    3.75     0   0.149
+
+------------------------------------------------------------------------------------------------------------
+RECOVERY, POOLED ACROSS GENERATORS
+------------------------------------------------------------------------------------------------------------
+  Share of the marks an error costs that each detector returns, with the
+  no-op anchoring 0%. This is the figure quoted in the documents.
+
+  detector                      recovery   AWARD (raw)   AWARD @1.8%
+  no-op (never correct)              0%          0.19         0.005
+  brute-force shift                 31%          0.47         0.239
+  LCS (maximally generous)         100%          4.21         3.688
+  fixed-cost DP alignment           99%          1.46         1.084
+  gated pair-HMM (reference)        33%          0.19         0.005
+
+  AWARD (raw) is a mean over benchmark cells, which hold three error
+  sheets per error-free sheet. A board screening at the historical 1.8%
+  base rate would see the reweighted figure instead.
+============================================================================================================
+
+------------------------------------------------------------------------------
+PROVENANCE
+------------------------------------------------------------------------------
+  code fingerprint : e6de1b8417d0  (over 3 loaded modules)
+  commit           : 644ac3d
+  python           : 3.14.3    numpy: 2.4.4
+  parameters       : seed=20260804, sheets_per_cell=12
+  Regenerating from unchanged code reproduces this file exactly;
+  an empty `git diff` is the check. See REPRODUCE.md.
+------------------------------------------------------------------------------

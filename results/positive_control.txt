@@ -1,0 +1,162 @@
+==============================================================================
+                      OMR ALIGNMENT ADJUDICATION REPORT                       
+==============================================================================
+Candidate            : POSITIVE-CONTROL
+Subject              : Mathematics (simulated slip at Q16)
+Questions / marks    : 46 / 46
+Options per item     : 4  (chance = 0.250)
+
+>>> VERDICT: RE-REGISTRATION ACCEPTED
+
+Original score       : 22 / 46 (47.8%)
+Adjudicated score    : 31 / 46 (67.4%)
+Items gained / lost  : 9 / 0
+
+------------------------------------------------------------------------------
+1. EVIDENCE
+------------------------------------------------------------------------------
+  log P(marks | H0, no shift)    =    -70.8764 nats
+  log P(marks | H1, some shift)  =    -48.2319 nats
+  log10 Bayes factor  BF(1:0)    =     +9.8344
+  Jeffreys interpretation        : decisive FOR shift
+  Prior P(sheet has a slip)      = 0.0180
+  Posterior P(shift | marks)     = 1.000000
+  Operating ability theta        = 0.8500
+     source: external evidence (other subjects / prior attainment)
+  Ability implied by this paper  = 0.8035   (DIAGNOSTIC ONLY -- never used for decoding)
+  Evidence break-even            = 1.35 questions
+     (a shift must newly repair at least this many answers before
+      the evidence outweighs the prior improbability of the slip)
+
+  ROBUSTNESS TO THE ABILITY ASSUMPTION
+  The verdict below is reported at one assumed ability. This table
+  sweeps every admissible ability, including the most generous:
+    theta   log10 BF  break-even  best score  MAP reading
+    0.251      0.504      718.83      22/46   identity (no shift)
+    0.301      1.012       14.97      22/46   identity (no shift)
+    0.351      1.856        7.92      33/46   RE-REGISTERED
+    0.401      2.757        5.50      33/46   RE-REGISTERED
+    0.451      3.664        4.25      33/46   RE-REGISTERED
+    0.501      4.576        3.48      33/46   RE-REGISTERED
+    0.551      5.502        2.94      33/46   RE-REGISTERED
+    0.601      6.459        2.54      33/46   RE-REGISTERED
+    0.650      7.468        2.23      33/46   RE-REGISTERED
+    0.700      8.556        1.97      33/46   RE-REGISTERED
+    0.750      9.766        1.74      33/46   RE-REGISTERED
+    0.800     11.170        1.54      33/46   RE-REGISTERED
+    0.850     12.903        1.35      33/46   RE-REGISTERED
+    0.900     15.219        1.16      33/46   RE-REGISTERED
+    0.950     18.934        0.95      33/46   RE-REGISTERED
+
+------------------------------------------------------------------------------
+2. MONTE-CARLO CALIBRATION  (assumption-free false-positive check)
+------------------------------------------------------------------------------
+  Statistic: coherence scan -- the most surprising contiguous block of
+  correct answers at ANY non-zero displacement, anywhere on the sheet.
+  Observed T = 7.6811   (i.e. best block p = 10^-7.68)
+  Strongest block: Q19-Q36 at offset +1, 16/18 correct (binomial p = 2.08e-08)
+  Secondary diagnostic, log evidence ratio = +29.6967
+  null                 p-value   null mean   null q95  null q99.9
+  key_marginal         0.00100       2.382      3.612       5.579
+  rotation             0.00100       2.676      3.612       3.612
+  block_bootstrap      0.00100       2.787      4.425       6.100
+  Reported (worst-case) p-value  = 0.00100  [binding null: key_marginal]
+
+------------------------------------------------------------------------------
+3. PRE-REGISTERED GATES
+------------------------------------------------------------------------------
+  [PASS] bayes_factor         value=9.83436  threshold=2
+         log10 BF(shift : no-shift) exceeds the decisive threshold
+  [PASS] posterior            value=1  threshold=0.95
+         posterior P(shift | marks) after the base-rate prior
+  [PASS] monte_carlo          value=0.001  threshold=0.01
+         worst-case Monte-Carlo p-value (binding null: key_marginal)
+  [PASS] segment_coherence    value=1  threshold=1
+         every displaced segment is long enough and above chance
+  [PASS] non_trivial          value=1  threshold=1
+         the MAP re-registration actually differs from the identity
+
+------------------------------------------------------------------------------
+4. MAP RE-REGISTRATION  (best-supported reading of the sheet)
+------------------------------------------------------------------------------
+  Segments of constant displacement: 3
+  segment                      n  correct    binom p  coherent
+  Q1-Q15 @ offset +0          15       12  1.236e-05  yes
+  Q16-Q35 @ offset +1         20       16  3.865e-07  yes
+  Q37-Q46 @ offset +0         10        5    0.07813  yes
+  Orphan marks (rows read by no question): [16]
+  Questions left unmatched: [36]
+
+  Detected displacement changes:
+    * at Q16: offset +0 -> +1
+      mechanism: 1 physical row(s) between row 16 and row 17 carry no question (candidate skipped 1 bubble row(s))
+    * at Q37: offset +1 -> +0
+      mechanism: 1 question(s) around Q36 were passed over on the paper without consuming a bubble row
+
+------------------------------------------------------------------------------
+5. ITEM LEDGER  (every question, every decision)
+------------------------------------------------------------------------------
+    Q  key       orig      final  off    post   chg  reason
+    1    B      r1=B*      r1=B*   +0  0.9996     -  kept: alignment agrees with original registration
+    2    D      r2=D*      r2=D*   +0  0.9991     -  kept: alignment agrees with original registration
+    3    A      r3=B       r3=B    +0  0.9908     -  kept: alignment agrees with original registration
+    4    A      r4=A*      r4=A*   +0  0.9942     -  kept: alignment agrees with original registration
+    5    A      r5=A*      r5=A*   +0  0.9963     -  kept: alignment agrees with original registration
+    6    C      r6=C*      r6=C*   +0  0.9976     -  kept: alignment agrees with original registration
+    7    C      r7=C*      r7=C*   +0  0.9970     -  kept: alignment agrees with original registration
+    8    C      r8=C*      r8=C*   +0  0.9970     -  kept: alignment agrees with original registration
+    9    C      r9=C*      r9=C*   +0  0.9977     -  kept: alignment agrees with original registration
+   10    A     r10=A*     r10=A*   +0  0.9972     -  kept: alignment agrees with original registration
+   11    A     r11=D      r11=D    +0  0.9943     -  kept: alignment agrees with original registration
+   12    B     r12=B*     r12=B*   +0  0.9990     -  kept: alignment agrees with original registration
+   13    C     r13=C*     r13=C*   +0  0.9987     -  kept: alignment agrees with original registration
+   14    D     r14=D*     r14=D*   +0  0.9921     -  kept: alignment agrees with original registration
+   15    A     r15=B      r15=B    +0  0.8647     -  kept: alignment agrees with original registration
+   16    A  r16=None   r16=None    +1  0.8604     -  kept: offset +1 proposed but posterior 0.8604 < 0.99
+   17    B     r17=D      r17=D    +1  0.9417     -  kept: offset +1 proposed but posterior 0.9417 < 0.99
+   18    A     r18=B      r18=B    +1  0.9435     -  kept: offset +1 proposed but posterior 0.9435 < 0.99
+   19    A     r19=B      r19=B    +1  0.9739     -  kept: offset +1 proposed but posterior 0.9739 < 0.99
+   20    B     r20=A      r21=B*   +1  0.9975  GAIN  re-registered to row 21 (offset +1, posterior 0.9975)
+   21    A     r21=B      r22=A*   +1  0.9994  GAIN  re-registered to row 22 (offset +1, posterior 0.9994)
+   22    D     r22=A      r23=D*   +1  0.9994  GAIN  re-registered to row 23 (offset +1, posterior 0.9994)
+   23    C     r23=D      r24=C*   +1  0.9950  GAIN  re-registered to row 24 (offset +1, posterior 0.9950)
+   24    B     r24=C      BLANK    +1  0.9422     -  unmatched: row 24 was re-registered to Q23, and a mark cannot answer two questions
+   25    A     r25=A*     r25=A*   +1  0.9419     -  kept: offset +1 proposed but posterior 0.9419 < 0.99
+   26    D     r26=B      r27=D*   +1  0.9958  GAIN  re-registered to row 27 (offset +1, posterior 0.9958)
+   27    A     r27=D      r28=A*   +1  0.9992  GAIN  re-registered to row 28 (offset +1, posterior 0.9992)
+   28    B     r28=A      r29=B*   +1  0.9991  GAIN  re-registered to row 29 (offset +1, posterior 0.9991)
+   29    B     r29=B*     r30=B*   +1  0.9991     -  re-registered to row 30 (offset +1, posterior 0.9991)
+   30    C     r30=B      r31=C*   +1  0.9983  GAIN  re-registered to row 31 (offset +1, posterior 0.9983)
+   31    C     r31=C*     r32=C*   +1  0.9975     -  re-registered to row 32 (offset +1, posterior 0.9975)
+   32    C     r32=C*     r33=C*   +1  0.9974     -  re-registered to row 33 (offset +1, posterior 0.9974)
+   33    C     r33=C*     r34=C*   +1  0.9980     -  re-registered to row 34 (offset +1, posterior 0.9980)
+   34    A     r34=C      r35=A*   +1  0.9976  GAIN  re-registered to row 35 (offset +1, posterior 0.9976)
+   35    D     r35=A      BLANK    +1  0.9815     -  unmatched: row 35 was re-registered to Q34, and a mark cannot answer two questions
+   36    A     r36=D      r36=D    +1  0.7828     -  kept: original registration
+   37    A     r37=A*     r37=A*   +1  0.5825     -  kept: alignment agrees with original registration
+   38    D     r38=C      r38=C    +0  0.4107     -  kept: alignment agrees with original registration
+   39    C     r39=C*     r39=C*   +0  0.6061     -  kept: alignment agrees with original registration
+   40    A     r40=A*     r40=A*   +0  0.5954     -  kept: alignment agrees with original registration
+   41    B     r41=A      r41=A    +0  0.5681     -  kept: alignment agrees with original registration
+   42    D     r42=D*     r42=D*   +0  0.5635     -  kept: alignment agrees with original registration
+   43    B     r43=D      r43=D    +0  0.5416     -  kept: alignment agrees with original registration
+   44    B     r44=B*     r44=B*   +0  0.5574     -  kept: alignment agrees with original registration
+   45    D     r45=B      r45=B    +0  0.5706     -  kept: alignment agrees with original registration
+   46    D     r46=C      r46=C    +0  0.7825     -  kept: alignment agrees with original registration
+  ('*' marks a correct answer under that registration)
+
+==============================================================================
+Constraints honoured: the marked sequence was never altered, reordered,
+or invented. Only the question<->row registration was considered, and
+only strictly increasing registrations were admissible.
+==============================================================================
+
+------------------------------------------------------------------------------
+PROVENANCE
+------------------------------------------------------------------------------
+  code fingerprint : 303b77849003  (over 2 loaded modules)
+  commit           : 644ac3d
+  python           : 3.14.3    numpy: 2.4.4
+  Regenerating from unchanged code reproduces this file exactly;
+  an empty `git diff` is the check. See REPRODUCE.md.
+------------------------------------------------------------------------------
