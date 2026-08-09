@@ -4,11 +4,9 @@
 What produced a results file.
 
 Everything in `results/` is committed and REPRODUCE.md presents it as something
-a reader can check. Until now nothing in those files recorded which code wrote
-them, so a stale result and a fresh one were indistinguishable on inspection.
-That is not hypothetical: a determinism check in this project once overwrote a
-committed results file with a tiny-n run, and it was caught by comparing against
-a copy kept outside the repository rather than by anything in the file itself.
+a reader can check. Without a record of what produced each file, one regenerated
+at the wrong sample size, or left behind by a code change, is indistinguishable
+from a current one on inspection.
 
 WHAT IS STAMPED, AND WHY IT IS NOT THE COMMIT
 

@@ -8,3 +8,5 @@ __pycache__/
 PRIVATE/
 .mplconfig/
 ENGINEERING_NOTES.md
+docs/make_diagram.py
+docs/check_diagram.py

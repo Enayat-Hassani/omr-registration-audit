@@ -1,6 +1,6 @@
 # Large Synthetic Shift-Detection Benchmark  (results)
 
-**Run**: 2026-08-06 23:54:46 +08  ·  mode `full`  ·  seed 20260804
+**Run**: mode `full`  ·  seed 20260804  ·  acceptance level 0.001
 
 ## Synthetic-only, NOT a deployment calibration
 
@@ -41,8 +41,8 @@ on the metrics corpus and reported as validation.
     python3 benchmark/large_synthetic.py --quick
     python3 benchmark/large_synthetic.py --full
 
-Determinism: every sheet is drawn from `random.Random` with seed
-`20260804 + 100000*(cell+1) + i`; seeds never rely on `hash()`.
+Determinism: every sheet is drawn from `random.Random` with a fixed, cell-specific
+seed derived from 20260804; seeds never rely on `hash()`.
 
 ## Files
 

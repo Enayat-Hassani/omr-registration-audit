@@ -1,160 +1,119 @@
 # Case report: the sheet that prompted this work
 
-Analysis of one candidate's answer sheet. The method and its validation are in
-[REPORT.md](REPORT.md), and neither depends on this case.
+This is an analysis of one disputed examination sheet. It motivated the detector
+but is not validation data. The detector design and synthetic evaluation are in
+[REPORT.md](REPORT.md); the answer files are described in [data/README.md](data/README.md).
 
-## 1. Background
+## 1. Background and data
 
-The case was raised through BANFES, the assessment system built by Education
-Bridge for Afghanistan.
-A candidate reported as performing well across all subjects scored 7 out of 46 in
-mathematics alone. The suggested explanation was that they had skipped a question
-and shifted every subsequent answer down one row.
+The case was raised through BANFES, an assessment system built by Education Bridge
+for Afghanistan. A candidate reportedly performed well in other subjects but
+scored 7/46 in mathematics. The proposed explanation was a skipped bubble row
+that shifted every later answer.
 
-The examination board set out two outcomes in advance: where evidence of a shift
-is strong, correct only the shift and leave genuinely wrong answers wrong; where
-evidence is insufficient, offer a re-examination. The method was developed against
-that framing.
+The mathematics section has 46 questions and four options. It occupies questions
+1–46 of a 150-question sheet. The answer key for the other 104 questions was not
+provided, so the claim about performance elsewhere cannot be checked.
 
-## 2. The data
+The public data contain the mathematics key and the candidate’s 46 marks. Rows
+1–46 agree exactly with the marking record. Rows 47–150 were transcribed from an
+image without independent verification and are not stored as verified data.
 
-46 mathematics questions, four options each. The mathematics section is questions
-1 to 46 on a 150-question multi-subject sheet arranged in four columns of 40, so
-it covers all of column one plus the first six rows of column two.
+## 2. Finding
 
-Score as marked: **7 out of 46**. Chance performance is about 11.5.
+**No re-registration is supported. The original score stands at 7/46.**
 
-The answer key for the other 104 questions was not provided. The claim that this
-candidate performed well elsewhere therefore remains unverified.
+The current default output is `results/case_default_prior.txt`:
 
-## 3. Finding
+| Criterion | Observed value | Requirement |
+|---|---:|---:|
+| log₁₀ Bayes factor | 0.1159 | ≥ 2.0 |
+| Posterior shift probability | 0.023378 | ≥ 0.95 |
+| Worst-null Monte Carlo p-value | 0.9010 | ≤ 0.010 |
+| Segment coherence | no displaced segment | required |
+| Non-trivial MAP registration | identity | required to differ |
 
-**No re-registration is supported. The original score stands.**
+The posterior uses the configured 1.8% sheet-level prior. The strongest coherent
+non-zero-offset block is Q31–Q35 at offset +3, with 4/5 correct and binomial
+tail p = 0.0156. The reported Monte Carlo p-value is 0.901 because the block
+bootstrap null is the least favourable of the three nulls.
 
-All five acceptance criteria fail, none of them narrowly.
+The default evidence break-even for this sheet is 2.55 questions. This is a
+diagnostic quantity, not a claim that correcting two or three questions would
+automatically justify re-registration: all gates still have to pass.
 
-| Criterion | Value | Threshold |
-|---|---|---|
-| Evidence ratio (log₁₀) | −1.75 | 2.00 |
-| Posterior probability of a shift | 0.0001 | 0.95 |
-| Monte Carlo p-value | 0.89 | 0.001 |
-| Segment coherence | no coherent displaced segment | all must pass |
-| Non-trivial | best reading is the identity | must differ |
+## 3. Supporting analyses
 
-The evidence break-even for this configuration is 5.22 questions. A shift would
-need to repair at least that many answers before it becomes more probable than
-the alternative.
+### Displacement search
 
-## 4. Supporting analyses
+The best raw displacement result is offset +12 with 15 correct matches out of 34.
+Its uncorrected p-value is 0.012; after accounting for the 77 tested offsets it
+is 0.59. This is a broad search diagnostic, not the detector’s acceptance test.
 
-Five independent lines, sharing no machinery.
+### Answer counts
 
-**Displacement search.** Every displacement from −41 to +41, small and large.
-Best result is +12 at 15 correct out of 34, uncorrected p = 0.012, which after
-correcting for 77 positions tested is p = 0.59.
+Reordering marks cannot change the number of each option. The observed counts are
+incompatible with the expected counts for a competent candidate at abilities of
+0.75 or above (`p ≤ 0.014`):
 
-**Coherence scan.** The strongest run of correct answers at any non-zero
-displacement is questions 31 to 35 at offset +3, four correct out of five. Sheets
-known to contain no shift produce evidence at least that strong 89% of the time.
+| Option | Key count | Candidate count |
+|---|---:|---:|
+| A | 16 | 7 |
+| B | 10 | 12 |
+| C | 11 | 13 |
+| D | 9 | 14 |
 
-**Answer counts.** This test is invariant under every position error at once, so
-it applies to the whole family at once. Re-ordering marks cannot create or destroy an
-option, so if these marks were a re-ordering of a competent candidate's answers,
-the counts would have to match.
+This position-invariant check argues against a simple reordering of a competent
+candidate’s answers. It does not identify why the observed sequence has this
+composition.
 
-| Option | Key contains | Candidate marked | A competent re-ordering would need |
-|---|---|---|---|
-| A | 16 | **7** | 14 to 16 |
-| B | 10 | 12 | 10 |
-| C | 11 | 13 | 11 |
-| D | 9 | 14 | 9 to 10 |
+### Other structure tests
 
-Incompatible at any assumed ability of 0.75 or above (p ≤ 0.014). This one test
-rules out shifting, reversal, wrong booklet version, block transposition and
-section misassignment simultaneously.
+The strongest mutual-information result has p = 0.78. Four change-point methods
+disagree: CUSUM selects Q11, binary segmentation Q12, the coherence scan Q31,
+and the pair HMM finds no non-identity change. The spread is 20 questions, so no
+single change-point result is persuasive.
 
-**Mutual information.** Tests for any statistical association between marks and
-key at any displacement, including partial or noisy relabellings that no
-permutation would capture. Nothing at any position, p = 0.78.
+The mathematics sequence has Lempel–Ziv complexity 13, compared with a random
+baseline of 17.3 (`p = 0.0004`). Equal-length windows elsewhere on the transcribed
+sheet have complexity 16–18. This analysis depends on unverified rows 47–150 and
+should be rerun against the board’s own digitization.
 
-**Change-point agreement.** Four detectors sharing no machinery. CUSUM says
-question 11, binary segmentation says 12, the coherence scan says 31, the pair
-HMM finds none. A spread of 20 questions, and the two that agree share a
-principle.
+## 4. Other registration hypotheses
 
-## 5. Other registration errors
-
-Shift is one member of a larger family. Each was tested and corrected for the
-size of its own search space.
+The case scripts test each family with its own search-space correction:
 
 | Family | Best result | Corrected p |
-|---|---|---|
-| Displacement, full range | offset +12, 15/34 | 0.59 |
-| Symbol relabelling combined with displacement | 12/19 | 0.57 |
-| Reversal, sheet scanned upside down | 9/46 | 0.85 |
-| Rotation, wrap-around | 17/46 | 0.89 |
-| Option relabelling, mis-registered bubble columns | 16/46 | 0.90 |
-| Block or column transposition | 17/46 | 0.998 |
+|---|---|---:|
+| Displacement | offset +12, 15/34 | 0.5948 |
+| Symbol + displacement | 12/19 | 0.5721 |
+| Reversal | 9/46 | 0.8471 |
+| Rotation | 17/46 | 0.8928 |
+| Option relabelling | 16/46 | 0.8950 |
+| Block/column swap | 17/46 | 0.9983 |
 
-## 6. Robustness to the ability assumption
+These are case-specific search results, not population estimates.
 
-The conclusion does not depend on how able the candidate is assumed to be. The
-evidence ratio was computed across the full admissible range, and the Monte Carlo
-p-value uses no ability estimate at all.
+## 5. Ability robustness
 
-Pushing the assumption further, the evidence gate can be made to pass by
-asserting the equivalent of 5000 prior items of evidence for the candidate's
-competence. The Monte Carlo criterion does not move in any condition, and the
-overall verdict is unchanged.
+The default case verdict is not accepted. If the external ability assertion is
+raised, the case can look more favourable to a shift under the likelihood model:
+at an operating ability of 0.85 the posterior is 0.1431 and the evidence gate
+still fails. The Monte Carlo p-value remains 0.9010 because it uses no ability
+model. At the highest stress-test prior concentration, the Bayes-factor and
+posterior gates can pass for some settings, but the Monte Carlo gate still fails.
 
-The premise is itself testable and does not hold. A candidate performing at 85%
-cannot produce 7 out of 46 under any admissible reading of this sheet. The best
-available reading yields 14 out of 46 against roughly 11 expected by chance.
+The result is therefore not “the candidate could not have been able”; it is that
+the available mathematics response pattern does not provide enough safe evidence
+for a correction under the configured decision rule.
 
-## 7. Data provenance
+## 6. Recommendation and missing evidence
 
-Physical rows 1 to 46 of the answer sheet reproduce the graded spreadsheet
-exactly, 46 out of 46. The correct rows were graded.
+The board’s stated framework calls for a re-examination rather than a statistical
+correction. A rescan of the physical sheet should come first, because faint marks,
+erasures, and double marks can create apparent registration errors more directly
+than a response-sequence model can resolve.
 
-Sliding the mathematics key across all 105 possible 46-row windows of the full
-sheet gives a best match of 20 out of 46 at row 76, corrected p = 0.39. The
-mathematics answers are not recorded in another subject's block.
-
-These two checks use the candidate's full 150-answer record, which is not in the
-public files. See section 9.
-
-## 8. Answer sequence structure
-
-The mathematics answers compress to a Lempel-Ziv complexity of 13, against a
-random-marking baseline of 17.3, p = 0.0004. Equal-length windows elsewhere on
-the same sheet give 16 to 18, so the pattern is specific to the mathematics
-section.
-
-Lempel-Ziv complexity is invariant under displacement. Moving a sequence does not
-compress it. If these marks were displaced genuine answers, their complexity
-would match the candidate's genuine answers elsewhere on the sheet. Together with
-the answer counts in section 4, this is a second position-invariant test pointing
-the same way.
-
-## 9. Limitations of this analysis
-
-The answer keys for the other 104 questions were not available, so the reported
-performance in other subjects could not be checked. This is the single most
-useful piece of missing information.
-
-Rows 1 to 46 of the sheet are verified against the graded spreadsheet. Rows 47 to
-150 were transcribed from a photograph with no independent check, and sections 7
-and 8 depend on them. They should be re-run against the board's own digitisation.
-Those rows are held separately and are available on request.
-
-## 10. Recommendation
-
-The evidence does not support correcting this sheet. Under the board's own
-stated framework, the re-examination is the appropriate route, and the board has
-confirmed it is available free and for a single subject.
-
-Two requests would improve on this. The answer keys for the remaining 104
-questions, which would settle whether the premise holds. And a re-scan of the
-physical sheet, since a material share of suspected shift errors are scanner
-misreads of faint or partially erased marks, which are resolved more cheaply and
-more certainly by inspection than by inference.
+The most valuable missing evidence is the answer key and marking record for the
+other 104 questions. A verified digitization of rows 47–150 would also allow the
+provenance and sequence-structure analyses to be rerun.

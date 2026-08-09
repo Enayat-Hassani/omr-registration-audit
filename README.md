@@ -1,131 +1,197 @@
 # Detecting registration errors in OMR answer sheets
 
-Optical mark recognition (OMR) produces two sequences: an answer key indexed by question number, and student marks indexed by physical row. Standard marking assumes these indices correspond. A registration error occurs when marks are physically correct but shifted relative to question numbers. The cause may be a scanner feed slip or, more often, a candidate skipping a bubble row while filling the sheet and continuing one row low; the detector cannot distinguish them and does not need to, because the correction is the same. Displacement (row shift) is the most common form. Skiena and Sumazin (2004) measured displacement in 1.8% of 101,265 exam papers.
+This repository studies a narrow problem in optical mark recognition (OMR): the
+marks were recorded correctly, but the rows are being compared with the wrong
+questions. A skipped bubble row and a scanner feed slip create the same index
+error, so the detector treats them alike. It does not infer which cause occurred.
 
-This repository contains a detector for registration errors, two synthetic evaluation benchmarks, and audit documentation. The work began with the analysis of a disputed examination sheet and expanded into a benchmark for evaluating registration error detectors.
+The project is a research implementation, not an operational marking system.
+All evaluation is synthetic. The repository contains one real disputed-sheet
+analysis, but it is a case study rather than validation data. No claim here
+establishes performance on a live examination.
 
-> **Status:** Research implementation. Validated on synthetic corpora, not for operational deployment. Cohort screening with false discovery rate control is implemented and measured on synthetic sittings; it requires a paper long enough to clear the multiple-comparisons threshold, and REPORT.md section 6.3 gives the arithmetic.
+## What the detector does
 
----
+The recommended method is a three-state pair hidden Markov model over possible
+paths through the question/row grid. A path can match a question to its original
+row, move to a nearby row, or leave a question or row unmatched, but it must stay
+monotone and cannot reuse a physical row. The model never edits or invents a mark.
+Candidate ability is integrated over a prior and is not fitted to the disputed
+sheet.
 
-## At a glance
+![How the detector reaches a verdict](docs/pipeline.png)
 
-* **5 detectors compared** on identical sheets: no correction, global displacement scan, LCS, fixed-cost affine alignment, and the gated pair HMM (recommended).
-* **5 acceptance criteria**, all required: Bayes factor ≥ 100, posterior ≥ 0.95, Monte Carlo p ≤ 0.01 against the worst of three nulls, every displaced segment ≥ 5 items and above chance at p ≤ 0.01, and a non-identity registration. Marks are then awarded per question where the item posterior exceeds 0.99, and questions that turn wrong are counted as losses.
-* **10,464 synthetic sheets** across two corpora with independent generators, both scoring all five detectors: 480 sheets over 10 behaviour models and 9 mechanisms, and 9,984 over 11 behaviour models and 18 mechanisms including scanner artefacts and adversarial sheets.
-* **Zero false positives observed on both corpora.** Bounds follow sample size: 22.1% per generator on corpus 1 (12 error-free sheets each), 0.07% on corpus 2 (3,840 pooled), 0.20% in the profile study (1,500). Zero observed is not zero risk; see Key Limitations for the condition that breaks it.
-* **27.9% recovery on the large corpus, 33% on the small one**, while awarding the same unearned marks as making no corrections at all (0.005 per sheet at the 1.8% base rate). Loosening the acceptance profile raises recovery to 45.7% on the profile study's own corpus, at no measured cost in false positives.
-* **0.65 s to fully adjudicate a 46-question sheet** at 999 permutation draws against three nulls. Batched permutation scanning, a precomputed binomial tail table, a shared forward pass across the ability grid, and short-circuiting sheets whose best registration is the identity. Every optimisation is verified to leave verdicts and awarded marks unchanged; the arithmetic ones are bit-identical, including with numpy absent.
+An alignment is accepted only if all five checks pass:
 
----
+- Bayes factor for a non-identity registration at least 100;
+- posterior probability of a registration error at least 0.95, using the
+  configured sheet-level slip rate as prior odds;
+- Monte Carlo coherence p-value at most the selected profile level, using the
+  worst of three null models;
+- every displaced segment has at least five items and is above chance at the
+  exact binomial p ≤ 0.01 level; and
+- the MAP alignment is not the identity.
 
-## Problem
+After acceptance, marks are re-registered one question at a time only when the
+posterior for that question’s offset is at least 0.99. Newly incorrect answers count
+as losses. This prevents a favourable alignment from being applied wholesale.
 
-Alignment search inflates scores even when no registration error exists. Under longest common subsequence (LCS) alignment, a random 46-question 4-option sheet scores an average of 27.3 out of 46 (chance expectation: 11.5).
+Blank rows and unanswered questions are different: a blank physical row shifts
+later marks, while an unanswered question lets the registration catch up. The
+implementation represents this with a strictly increasing injection.
 
-The detector is designed to avoid false corrections first, then maximize recovery under that constraint.
+## Main results
 
----
+The shipped default is the Balanced profile (Monte Carlo level 0.01, 999 draws).
+The headline results below are committed synthetic outputs. “Recovery” measures
+marks returned after a planted error; “power” counts only correctly localized
+detections. Neither is a live-paper performance estimate.
 
-## Detector design
+### Corpus 1: model comparison
 
-The primary detector uses a Gated Pair Hidden Markov Model (HMM) over monotone lattice paths. 
+This corpus contains 480 synthetic sheets: ten candidate-response generators,
+three injected error conditions, and 12 error-free sheets per generator. FPR is
+the fraction of clean sheets that were wrongly corrected; recovery is the share
+of marks lost to a planted error that the method returns; unearned marks are
+marks awarded that the constructed truth says were not earned. The table reports
+the pooled summary in `results/benchmark.txt`; each generator’s FPR is also
+reported separately there.
 
-The implementation differs from a conventional alignment model in three places:
-* **Marginalized candidate ability:** Candidate ability is marginalized over a Beta prior and is never fitted to the disputed sheet. Fitting ability directly to a disputed paper creates circular reasoning, as finding an alignment artificially inflates the fitted ability.
-* **Permutation-based acceptance:** Acceptance requires passing a Monte Carlo permutation test that preserves candidate run structure. The permutation gate uses no ability model, making safety invariant to asserted ability claims.
-* **Item-level re-registration:** Passing acceptance does not award marks in bulk. Items are re-registered individually where marginal posterior probability exceeds 0.99, and questions that become incorrect under an alignment reduce the awarded score.
+| Detector | Worst clean-sheet FPR | Recovery | Unearned marks, raw | Unearned marks reweighted to 1.8% |
+|---|---:|---:|---:|---:|
+| No correction | 0.000 | 0% | 0.19 | 0.005 |
+| Global displacement scan | 0.417 | 31% | 0.47 | 0.239 |
+| Longest common subsequence | 1.000 | 100% | 4.21 | 3.688 |
+| Fixed-cost affine alignment | 1.000 | 99% | 1.46 | 1.084 |
+| **Gated pair HMM** | **0.000** | **33%** | **0.19** | **0.005** |
 
----
+The raw unearned-mark column averages cells containing three error sheets per
+error-free sheet, so it is not a deployment expectation. The 1.8% column applies
+the historical rate reported by Skiena and Sumazin (2004); it is a sensitivity
+calculation, not a local prevalence estimate. A zero observed false-positive rate
+is not zero risk: 12 clean sheets per generator gives a 95% exact upper bound of
+22.1% for an individual generator.
 
-## Evaluation & Performance
+### Corpus 2: independent large benchmark
 
-Five alignment models were measured across two synthetic corpora:
+The second corpus contains 9,984 synthetic sheets generated by separate code,
+with 3,840 clean sheets and 6,144 error sheets. It includes 11 response models,
+18 error mechanisms, scanner artefacts, several paper lengths, and five-option
+conditions. All five detectors were scored on the same sheets.
 
-### Corpus 1: Benchmark Model Comparison (480 sheets)
+| Detector | False positives / clean | FPR | Correctly localized power | Recovery | Unearned marks |
+|---|---:|---:|---:|---:|---:|
+| No correction | 0 / 3,840 | 0.0000 | 0% | 0% | 2,665 |
+| **Gated pair HMM** | **0 / 3,840** | **0.0000** | **11.2%** | **27.9%** | **2,703** |
+| Global displacement scan | 520 / 3,840 | 0.1354 | 7.6% | 55.5% | 11,065 |
+| Fixed-cost affine alignment | 1,028 / 3,840 | 0.2677 | 18.3% | 42.5% | 29,940 |
+| Longest common subsequence | 3,201 / 3,840 | 0.8336 | 0% | 89.8% | 141,249 |
 
-| Alignment Model | Worst-case FPR | Unearned Marks (Raw) | Unearned Marks (1.8% Base Rate) | Recovery Rate |
-|---|---|---|---|---|
-| No correction (Baseline) | 0.00 | 0.19 | 0.005 | 0% |
-| Global displacement scan | 0.42 | 0.47 | 0.239 | 31% |
-| Longest common subsequence | 1.00 | 4.21 | 3.688 | 100% |
-| Fixed-cost affine alignment | 1.00 | 1.46 | 1.084 | 99% |
-| **Gated Pair HMM** | **0.00** | **0.19** | **0.005** | **33%** |
-
-At the historical 1.8% base rate, the Gated Pair HMM matches the no-correction baseline on unearned marks (0.005 per sheet) while recovering 33% of lost marks.
-
-Worst-case FPR is the maximum across the ten generators, each measured on 12 error-free sheets. An observed 0.00 in a cell bounds that generator's rate below 22.1% at 95% confidence (Clopper-Pearson, exact) — 12 sheets is a weak bound, and the figures are reported per generator rather than pooled, because a pooled average hides the generator under which a method fails. Corpus 2 is where the false positive claim is actually bounded, on 3,840 error-free sheets. Zero observed is not zero risk. The raw unearned-marks column is a mean over benchmark cells holding three error sheets per error-free sheet, and is not a deployment expectation; the 1.8% column reweights it to the measured base rate.
-
-### Corpus 2: Large-Scale Evaluation, Independent Generator (9,984 sheets)
-
-All five detectors, scored on identical sheets, with false-positive rates over 3,840 error-free sheets rather than 12 per generator.
+The gated detector returned 29,036 marks that were genuinely at stake and
+awarded 2,703 unearned marks. The no-correction floor was 2,665, so the detector
+added 38 unearned marks in this synthetic corpus. It detected 895 sheets, of
+which 207 were localized incorrectly. The zero-FP observation has a pooled 95%
+upper bound of 0.07%, not a proof of zero risk.
 
 ![Recovery against false-positive rate](results/figures/recovery_vs_fpr_large.png)
 
-| Detector | False positives | FPR | Recovery | Unearned marks |
-|---|---|---|---|---|
-| No correction | 0 of 3,840 | 0.000 | 0% | 2,665 |
-| **Gated Pair HMM** | **0 of 3,840** | **0.000** | **27.9%** | **2,703** |
-| Global displacement scan | 520 | 0.135 | 55.5% | 11,065 |
-| Fixed-cost affine alignment | 1,028 | 0.268 | 42.5% | 29,940 |
-| Longest common subsequence | 3,201 | 0.834 | 89.8% | 141,249 |
+The figure uses the same committed corpus summary as the table. Recovery is the
+share of genuinely lost marks returned; the horizontal safety axis is the clean
+sheet false-positive rate.
 
-Making no correction already awards 2,665 unearned marks, because some sheets are contaminated before the detector sees them. The gated model's excess over that floor is **38 marks across 9,984 sheets**. Longest common subsequence accepts 83% of clean sheets and awards an excess of 138,584.
+### Operating profiles
 
----
+The profiles were measured separately on 150 synthetic 20-question papers with
+single-row skips and abilities from 0.55 to 0.95. They are named operating
+points, not calibrated false-positive rates.
 
-## Operating Profiles
+| Profile | Level | Detections | Marks recovered | Recovery | Smallest accepted block |
+|---|---:|---:|---:|---:|---:|
+| Conservative | 0.001 | 23 / 150 | 280 / 1,220 | 23.0% | 11 |
+| **Balanced** | **0.010** | **46 / 150** | **469 / 1,220** | **38.4%** | **9** |
+| Sensitive | 0.050 | 63 / 150 | 558 / 1,220 | 45.7% | 8 |
 
-Acceptance thresholds are exposed as three pre-calibrated operating profiles:
+In the accompanying certification arm, no profile accepted any of 1,500 clean
+synthetic sheets at level 0.1, which is looser than all three profiles. The exact
+95% upper bound is 0.20%. The absence of false positives in that sample does not
+calibrate a profile for real papers.
 
-| Profile | Threshold $\alpha$ | Mark Recovery | Detections (150 Skips) | Smallest Block Accepted |
-|---|---|---|---|---|
-| Conservative | 0.001 | 23.0% | 23 of 150 | 11 correct answers |
-| **Balanced (Default)** | **0.010** | **38.4%** | **46 of 150** | **9 correct answers** |
-| Sensitive | 0.050 | 45.7% | 63 of 150 | 8 correct answers |
+## Case study
 
-`Balanced` is the default configuration. Across 300 error-free sheets, `Conservative` yielded no fewer false positives than `Balanced`, while recovering two-fifths fewer marks on genuine skips.
+The motivating 46-question mathematics sheet was scored 7/46. The default
+analysis returned a posterior shift probability of 0.023378, a Monte Carlo
+p-value of 0.9010, and the identity alignment. No re-registration is supported;
+the original score stands. A planted positive control on the same key is detected
+and re-registered. The public case analysis is in [CASE_REPORT.md](CASE_REPORT.md).
 
----
+## Important limitations
 
-## Disputed Case Audit Summary
+- Recovery is low and depends strongly on answer quality and error mechanism. In
+  the committed validation output, one-row-shift power ranges from 0.333 at
+  ability 0.55 to 0.933 at ability 0.85; two-row-shift power ranges from 0.067 to
+  0.450 in those same conditions.
+- In corpus 2, correctly localized power is 0.112 and 23% of detections are
+  mislocalized. A flagged sheet can therefore receive no recovered credit.
+- The coherence gate needs a contiguous run of evidence. On the profile study’s
+  20-question papers, the smallest accepted displaced block was 8–11 correct
+  marks depending on profile. Short papers and slips confined by sheet design are
+  poorly served.
+- Non-monotone events, such as answering a skipped question later, are not
+  representable exactly. The mechanism benchmark treats the deferred answer as
+  an approximate monotone alignment.
+- Clean digitization is assumed in the core response sequence. Faint marks,
+  erasures, and double marks should be inspected or rescanned first.
+- Brier scores, posterior values, and false-positive bounds are synthetic or
+  comparative unless explicitly labelled otherwise. There is no confirmed
+  historical corpus in this repository.
+- The 1.8% slip rate, maximum displacement of three rows, mechanism frequencies,
+  and external-ability policy are assumptions or external inputs, not estimates
+  learned here.
 
-Audit of a candidate scoring 7 out of 46 in mathematics produced a Monte Carlo $p$-value of 0.901 and a Bayes factor favoring no shift. Re-registration was rejected, and the original score stood. A planted shift on the same key was detected and corrected. Full details are in [CASE_REPORT.md](CASE_REPORT.md).
+## Repository map
 
----
-
-## Key Limitations
-
-* **Low overall recovery:** Mark recovery is 27.9% on corpus 2 and 33% on corpus 1. Overall detection power on Corpus 2 is 0.112; the detector stays silent on roughly 9 out of 10 genuine shifts to protect against false positives.
-* **Mislocation rate:** 207 of 895 detections (23%) misidentified the change-point location, flagging the sheet without returning credit.
-* **Detection floor:** Requires a contiguous block of 8 to 11 correct marks at non-zero offset depending on profile, and 9 at the default. On a 20-question paper this is a large share of the sheet, so short exams are poorly served. Sheet designs that confine a slip to a small block make errors cheaper and simultaneously undetectable; REPORT.md section 11.1 gives the trade-off.
-* **Single-sheet evidence only:** A displaced block of correct answers is treated as a registration error regardless of how it arose. A candidate copying from a neighbour whose sheet was displaced produces identical evidence and can be accepted. Detecting copying is outside the scope of this tool.
-* **Synthetic validation:** All evaluation relies on synthetic corpora. Operational calibration requires confirmed historical cases.
-
----
-
-## Documentation Index
-
+```text
+REPORT.md             technical report and evidence audit
+CASE_REPORT.md        motivating-sheet analysis
+ASSUMPTIONS.md        design assumptions and measured outcomes
+REPRODUCE.md          commands and reproducibility notes
+data/                 answer data and corpus descriptions
+omr_api.py            one-call adjudication API
+omr_shift.py          detector implementation
+benchmark/            corpus generators, comparisons, and controls
+analysis/              case-study analyses
+results/              committed tables, JSON, figures, and provenance
 ```
-REPORT.md             Technical report and experimental evaluation
-CASE_REPORT.md        Analysis of the motivating examination sheet
-ASSUMPTIONS.md        Design assumptions and what the measurements showed
-REPRODUCE.md          Commands to regenerate every result
-data/README.md        Data sources and how each corpus is generated
-Colab_demo.ipynb      Runs the detector in a browser, no install
-```
-
----
 
 ## Quickstart
 
-Python 3.9 or later. Detection and adjudication use the standard library only;
-`numpy` and `matplotlib` are needed for the figures and the benchmarks.
+Python 3.9 or later is required. Detection uses the standard library; NumPy and
+Matplotlib are used by the benchmark and figure scripts.
 
 ```bash
 pip install -r requirements.txt
-python3 benchmark/verify_corpus.py     # Verification suite (~1 min)
-python3 omr_shift.py                   # Core detector & case analysis
-python3 benchmark/omrbench.py --n 12    # Benchmark comparison
-python3 benchmark/large_synthetic.py --full   # Corpus 2 evaluation (~2.1 hours)
+python3 benchmark/verify_corpus.py
+python3 omr_shift.py
+python3 benchmark/omrbench.py --n 12
 ```
+
+For an application-level call:
+
+```python
+from omr_api import adjudicate_sheet
+
+result = adjudicate_sheet(
+    key=['C', 'A', 'D', 'B'],
+    marks=['C', 'A', None, 'B'],
+    profile='balanced',
+)
+print(result.summary())
+print(result.explain())
+```
+
+See [REPRODUCE.md](REPRODUCE.md) for the full command sequence, including the
+long benchmark and the negative-control experiments.
+
+## Tooling
+
+Implementation assisted by Claude (Anthropic).

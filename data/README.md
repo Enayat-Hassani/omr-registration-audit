@@ -91,23 +91,23 @@ it is the only way to tighten the claim.
 The threshold sweep runs on a corpus disjoint from the metrics arm, over one
 mechanism per structural family, and varies the acceptance level and nothing
 else. Its rows are the three profiles a board can select. Its purpose is the
-recovery comparison across mechanisms the profile study in
-[REPORT.md](../REPORT.md) section 6.1 does not cover; the false positive bound in
-6.1 is tighter and remains the one to quote.
+recovery comparison across mechanisms the 20-question profile study in
+[REPORT.md](../REPORT.md) section 7.1 does not cover; neither sweep is a real-world
+false-positive calibration.
 
 ### First corpus
 
 `benchmark/omrbench.py`. Ten candidate behaviour models against nine error
 mechanisms, with five detectors scored on identical sheets. Each cell holds 12
 error-free and 36 error sheets. Four options per question, fixed sheet length.
-Used for [REPORT.md](../REPORT.md) sections 4 and 8. Output in
+Used for [REPORT.md](../REPORT.md) sections 5 and 8. Output in
 `results/benchmark.txt` and `results/benchmark.json`, with the per-mechanism
 breakdown from `benchmark/mechanisms.py` in `results/benchmark_mechanisms.txt`.
 
 ### Second corpus
 
 `benchmark/large_synthetic.py`. 9,984 sheets across eleven candidate behaviour
-models and eighteen error mechanisms, with three detectors scored on identical
+models and eighteen error mechanisms, with all five detectors scored on identical
 sheets. Covers conditions the first corpus does not:
 
 | Group | Contents |
@@ -117,7 +117,7 @@ sheets. Covers conditions the first corpus does not:
 | Sheet geometry | exam lengths from short to long; four-option and five-option papers |
 | Displacement | single and double row skips, boundary slips, two separate shifts on one sheet, self-corrected shifts, deferred questions |
 
-Used for [REPORT.md](../REPORT.md) section 6.4. Output in
+Used for [REPORT.md](../REPORT.md) section 6. Output in
 `results/large_synthetic/` at the current default acceptance level, and in
 `results/large_synthetic_conservative/` at level 0.001. Both runs use seed
 20260804 and generate identical sheets, so the two differ only in the acceptance
@@ -125,7 +125,7 @@ level.
 
 Each run writes `summary.txt` with the pooled counts, `per_condition.csv` with one
 row per condition, `per_sheet.csv` with one row per sheet, `threshold_sweep.csv`
-for the five policy rows, and `failure_cases.json` with a capped sample of
+for the three policy rows, and `failure_cases.json` with a capped sample of
 sheets the detector handled incorrectly.
 
 `per_sheet.csv` records the ground-truth status and adjudication outcome for
@@ -143,7 +143,7 @@ sheet length 20 and single-row skips only, deliberately: the detection floor is
 an absolute number of correct marks, so it consumes the largest share of a short
 paper, and a single skip is the mechanism the model represents most directly.
 The figures therefore describe the hard case for the floor and the easy case for
-the mechanism, and section 6.1 says so.
+the mechanism, and section 7.1 says so.
 
 Three arms, three sample sizes, each set by its own claim. 300 error-free sheets
 for the calibration arm, enough to put a 95% interval of about ±0.03 around the

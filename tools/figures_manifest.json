@@ -26,7 +26,7 @@
       "source": "results/large_synthetic/summary.json",
       "path": "overall.gated.recovery",
       "format": "pct1",
-      "claimed": "28.8%"
+      "claimed": "27.9%"
     },
     {
       "label": "corpus 2: gated false positives",
@@ -50,7 +50,7 @@
       "source": "results/large_synthetic/summary.json",
       "path": "overall.gated.power",
       "format": "num3",
-      "claimed": "0.094"
+      "claimed": "0.112"
     },
     {
       "label": "corpus 2: gated unearned marks",
@@ -58,7 +58,7 @@
       "source": "results/large_synthetic/summary.json",
       "path": "overall.gated.unearned",
       "format": "int_comma",
-      "claimed": "2,835"
+      "claimed": "2,703"
     },
     {
       "label": "corpus 2: no-correction unearned marks",
@@ -66,15 +66,15 @@
       "source": "results/large_synthetic/summary.json",
       "path": "overall.noop.unearned",
       "format": "int_comma",
-      "claimed": "2,793"
+      "claimed": "2,665"
     },
     {
       "label": "corpus 2: displacement scan FPR",
       "doc": "README.md",
       "source": "results/large_synthetic/summary.json",
       "path": "overall.bruteforce.fpr",
-      "format": "num3",
-      "claimed": "0.135"
+      "format": "num4",
+      "claimed": "0.1354"
     },
     {
       "label": "corpus 2: displacement scan recovery",
@@ -82,15 +82,15 @@
       "source": "results/large_synthetic/summary.json",
       "path": "overall.bruteforce.recovery",
       "format": "pct1",
-      "claimed": "55.8%"
+      "claimed": "55.5%"
     },
     {
       "label": "corpus 2: fixed-cost FPR",
       "doc": "README.md",
       "source": "results/large_synthetic/summary.json",
       "path": "overall.fixedcost.fpr",
-      "format": "num3",
-      "claimed": "0.163"
+      "format": "num4",
+      "claimed": "0.2677"
     },
     {
       "label": "corpus 2: fixed-cost recovery",
@@ -98,15 +98,15 @@
       "source": "results/large_synthetic/summary.json",
       "path": "overall.fixedcost.recovery",
       "format": "pct1",
-      "claimed": "42.2%"
+      "claimed": "42.5%"
     },
     {
       "label": "corpus 2: LCS FPR",
       "doc": "README.md",
       "source": "results/large_synthetic/summary.json",
       "path": "overall.lcs.fpr",
-      "format": "num3",
-      "claimed": "0.830"
+      "format": "num4",
+      "claimed": "0.8336"
     },
     {
       "label": "corpus 2: LCS recovery",
@@ -122,7 +122,7 @@
       "source": "results/large_synthetic/summary.json",
       "path": "overall.lcs.unearned",
       "format": "int_comma",
-      "claimed": "141,684"
+      "claimed": "141,249"
     },
     {
       "label": "corpus 2: pooled false positive bound",
@@ -154,7 +154,7 @@
       "source": "results/benchmark.txt",
       "pattern": "fixed-cost DP alignment\\s+(\\d+)%",
       "format": "aspct0",
-      "claimed": "94%"
+      "claimed": "99%"
     },
     {
       "label": "corpus 1: gated unearned raw",
@@ -194,7 +194,7 @@
       "source": "results/policy_profiles.txt",
       "pattern": "0\\.01\\s+balanced\\s+\\d+/\\d+\\s+\\d+/\\d+\\s+([\\d.]+)%",
       "format": "aspct1",
-      "claimed": "34.9%"
+      "claimed": "38.4%"
     },
     {
       "label": "profile: sensitive recovery",
@@ -202,7 +202,7 @@
       "source": "results/policy_profiles.txt",
       "pattern": "0\\.05\\s+sensitive\\s+\\d+/\\d+\\s+\\d+/\\d+\\s+([\\d.]+)%",
       "format": "aspct1",
-      "claimed": "41.2%"
+      "claimed": "45.7%"
     },
     {
       "label": "profile: conservative detections",
@@ -218,7 +218,7 @@
       "source": "results/policy_profiles.txt",
       "pattern": "0\\.01\\s+balanced\\s+(\\d+)/150",
       "format": "int",
-      "claimed": "41"
+      "claimed": "46"
     },
     {
       "label": "profile: sensitive detections",
@@ -226,7 +226,7 @@
       "source": "results/policy_profiles.txt",
       "pattern": "0\\.05\\s+sensitive\\s+(\\d+)/150",
       "format": "int",
-      "claimed": "52"
+      "claimed": "63"
     },
     {
       "label": "profile: certification bound",
@@ -242,7 +242,7 @@
       "source": "results/large_synthetic/summary.json",
       "path": "overall.gated.tp_wrongloc",
       "format": "int",
-      "claimed": "302"
+      "claimed": "207"
     },
     {
       "label": "corpus 2: gated Brier",
@@ -250,7 +250,7 @@
       "source": "results/large_synthetic/summary.json",
       "path": "overall.gated.brier",
       "format": "num4",
-      "claimed": "0.202"
+      "claimed": "0.2092"
     }
   ]
 }
