@@ -7,7 +7,7 @@ can take substantially longer than the control suite; use the quick modes first.
 ## Core reports and controls
 
 ```bash
-python3 omr_shift.py
+python3 -m omr_registration_audit.core
 python3 benchmark/omrbench.py --n 12
 python3 benchmark/mechanisms.py --n 14
 python3 benchmark/policy_profiles.py

@@ -10,3 +10,6 @@ PRIVATE/
 ENGINEERING_NOTES.md
 docs/make_diagram.py
 docs/check_diagram.py
+build/
+*.egg-info/
+dist/

@@ -328,7 +328,7 @@ class ChangePointConsensus:
     def hmm_posterior(self) -> Optional[int]:
         """Where the pair-HMM's posterior displacement first leaves zero."""
         try:
-            from omr_shift import (AdjudicationConfig, EvidenceEngine,
+            from omr_registration_audit import (AdjudicationConfig, EvidenceEngine,
                                    ResponseSheet, ScoringModel)
             from dataclasses import replace as _replace
             cfg = _replace(AdjudicationConfig(), external_ability=0.85)
@@ -345,7 +345,7 @@ class ChangePointConsensus:
     def coherence_scan(self) -> Optional[int]:
         """Start of the most coherent displaced block."""
         try:
-            from omr_shift import AdjudicationConfig, CoherenceScanStatistic, ResponseSheet
+            from omr_registration_audit import AdjudicationConfig, CoherenceScanStatistic, ResponseSheet
             cfg = AdjudicationConfig()
             _, w = CoherenceScanStatistic(cfg, 4).compute(
                 ResponseSheet(tuple(self.key), tuple(self.marks)))
@@ -465,7 +465,7 @@ def report(key: Sequence[str], marks: Sequence[str]) -> str:
 
 
 if __name__ == "__main__":
-    from omr_shift import load_case_records
+    from omr_registration_audit import load_case_records
     _rec = load_case_records()
     key = [r["correct"] for r in _rec]
     marks = [r["student"] for r in _rec]

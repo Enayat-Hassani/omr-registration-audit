@@ -36,7 +36,7 @@ for _p in (_HERE, _ROOT, os.path.join(_ROOT, "analysis")):
     if _p not in sys.path:
         sys.path.insert(0, _p)
 
-from omr_shift import (  # noqa: E402
+from omr_registration_audit import (  # noqa: E402
     AdjudicationConfig, Adjudicator, BandedPairHMM, ResponseSheet, ScoringModel,
 )
 
@@ -279,7 +279,7 @@ def experiment(n_sheets: int = 120, seed: int = 20260804) -> str:
 
     The appellant sheet is NEVER part of the calibration cohort.
     """
-    from omr_shift import CoherenceScanStatistic
+    from omr_registration_audit import CoherenceScanStatistic
     rng = random.Random(seed)
     OPT = ("A", "B", "C", "D")
     N = 46

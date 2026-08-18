@@ -40,7 +40,7 @@ from typing import Dict, List, Optional, Sequence
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 import provenance  # noqa: E402
-from omr_shift import (  # noqa: E402
+from omr_registration_audit import (  # noqa: E402
     AdjudicationConfig,
     Adjudicator,
     Policy,

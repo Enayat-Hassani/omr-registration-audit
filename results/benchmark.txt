@@ -180,8 +180,8 @@ RECOVERY, POOLED ACROSS GENERATORS
 ------------------------------------------------------------------------------
 PROVENANCE
 ------------------------------------------------------------------------------
-  code fingerprint : e6de1b8417d0  (over 3 loaded modules)
-  commit           : 644ac3d
+  code fingerprint : 4dbf53420220  (over 5 loaded modules)
+  commit           : f9a9c44
   python           : 3.14.3    numpy: 2.4.4
   parameters       : seed=20260804, sheets_per_cell=12
   Regenerating from unchanged code reproduces this file exactly;

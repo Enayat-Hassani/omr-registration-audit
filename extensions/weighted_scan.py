@@ -38,7 +38,7 @@ for _p in (_HERE, _ROOT, os.path.join(_ROOT, "analysis")):
     if _p not in sys.path:
         sys.path.insert(0, _p)
 
-from omr_shift import (  # noqa: E402
+from omr_registration_audit import (  # noqa: E402
     AdjudicationConfig, CoherenceScanStatistic, ResponseSheet,
 )
 from irt_model import ItemBank, sigmoid  # noqa: E402
@@ -159,7 +159,7 @@ def _mc_p(scan, sheet, observed, n_perm, rng, alpha: Optional[float] = None) -> 
 
 
 def experiment(n_sheets: int = 60, n_perm: int = 1200, seed: int = 20260805) -> str:
-    from omr_shift import CASE_SHEET
+    from omr_registration_audit import CASE_SHEET
     rng = random.Random(seed)
     OPT = ("A", "B", "C", "D")
     N = 46

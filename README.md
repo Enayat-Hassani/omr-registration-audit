@@ -151,16 +151,16 @@ and re-registered. The public case analysis is in [CASE_REPORT.md](CASE_REPORT.m
 ## Repository map
 
 ```text
-REPORT.md             technical report and evidence audit
-CASE_REPORT.md        motivating-sheet analysis
-ASSUMPTIONS.md        design assumptions and measured outcomes
-REPRODUCE.md          commands and reproducibility notes
-data/                 answer data and corpus descriptions
-omr_api.py            one-call adjudication API
-omr_shift.py          detector implementation
-benchmark/            corpus generators, comparisons, and controls
-analysis/              case-study analyses
-results/              committed tables, JSON, figures, and provenance
+REPORT.md                technical report and evidence audit
+CASE_REPORT.md           motivating-sheet analysis
+ASSUMPTIONS.md           design assumptions and measured outcomes
+REPRODUCE.md             commands and reproducibility notes
+data/                    answer data and corpus descriptions
+omr_registration_audit/  the installable library (core, api)
+provenance.py            records what produced each results file
+benchmark/               corpus generators, comparisons, and controls
+analysis/                case-study analyses
+results/                 committed tables, JSON, figures, and provenance
 ```
 
 ## Quickstart
@@ -171,14 +171,33 @@ Matplotlib are used by the benchmark and figure scripts.
 ```bash
 pip install -r requirements.txt
 python3 benchmark/verify_corpus.py
-python3 omr_shift.py
+python3 -m omr_registration_audit.core
 python3 benchmark/omrbench.py --n 12
 ```
+
+## Install
+
+From a clone, which is also what you need to reproduce the results:
+
+```bash
+git clone https://github.com/Enayat-Hassani/omr-registration-audit.git
+cd omr-registration-audit
+pip install .
+```
+
+Or directly, without cloning:
+
+```bash
+pip install git+https://github.com/Enayat-Hassani/omr-registration-audit.git
+```
+
+Detection and adjudication use the standard library only. The benchmarks and
+figures need extras: `pip install ".[benchmarks]"`.
 
 For an application-level call:
 
 ```python
-from omr_api import adjudicate_sheet
+from omr_registration_audit import adjudicate_sheet
 
 result = adjudicate_sheet(
     key=['C', 'A', 'D', 'B'],
@@ -188,6 +207,26 @@ result = adjudicate_sheet(
 print(result.summary())
 print(result.explain())
 ```
+
+`profile` sets the acceptance level and the permutation draw count together.
+Pass `external_ability=` when the board has an independent estimate of the
+candidate's ability from other subjects; it is never fitted to the disputed
+sheet. Every threshold is reachable through `AdjudicationConfig` for callers
+who need to set them directly.
+
+To screen a whole sitting with false discovery rate control:
+
+```python
+from omr_registration_audit import screen_cohort
+
+report = screen_cohort(sheets, q=0.05, profile="balanced")
+print(report.text())
+```
+
+The permutation draw count is derived from the cohort size rather than the
+profile, because the step-up threshold is q/m and a p-value cannot fall below
+1/(draws+1). Section 6.3 of the report gives the paper-length requirement this
+implies.
 
 See [REPRODUCE.md](REPRODUCE.md) for the full command sequence, including the
 long benchmark and the negative-control experiments.

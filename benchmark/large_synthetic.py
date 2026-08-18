@@ -86,7 +86,7 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt          # noqa: E402
 
 import provenance                          # noqa: E402
-from omr_shift import (                   # noqa: E402
+from omr_registration_audit import (                   # noqa: E402
     AdjudicationConfig, Adjudicator, ResponseSheet, clopper_pearson_upper,
 )
 from omrbench import (                    # noqa: E402
@@ -108,7 +108,7 @@ def _cp_upper_safe(k: int, n: int, alpha: float = 0.05) -> float:
 
     The exact form used to raise OverflowError at corpus scale, which is what
     this wrapper was written to avoid. That is fixed in
-    omr_shift.clopper_pearson_upper, which now accumulates the binomial tail in
+    clopper_pearson_upper, which now accumulates the binomial tail in
     log space. Wilson is kept for large n because it is cheaper, not because the
     exact form fails. Switching to exact throughout would move the pooled bounds
     slightly and require a full re-run."""
@@ -674,7 +674,7 @@ BASE_CFG = AdjudicationConfig()
 
 POLICIES: Dict[str, Dict] = {
     # The sweep varies the acceptance level and NOTHING else, so its rows are the
-    # profiles an examination board can actually select (omr_shift.Policy). A
+    # profiles an examination board can actually select (Policy). A
     # level below Conservative was measured and dropped: at alpha = 0.0005 the
     # derived draw count is 19,999 and one policy row costs 108 minutes, which
     # buys a single point below a curve section 6.1 already covers.
@@ -689,7 +689,7 @@ POLICIES: Dict[str, Dict] = {
 
 # Draws per policy. The count is not independent of the level it tests: the gate
 # admits at most floor(alpha*(n+1)-1) exceedances, so a level below 1/(n+1) can
-# never be reached. Derived rather than chosen, matching omr_shift.Policy.
+# never be reached. Derived rather than chosen, matching Policy.
 POLICY_PERM: Dict[str, int] = {
     "conservative": 9999,
     "balanced": 999,

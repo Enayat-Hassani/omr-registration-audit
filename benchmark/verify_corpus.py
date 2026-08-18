@@ -47,7 +47,7 @@ from typing import Dict, List, Optional, Sequence, Tuple
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from omr_shift import (  # noqa: E402
+from omr_registration_audit import (  # noqa: E402
     AdjudicationConfig,
     Adjudicator,
     Policy,
@@ -242,7 +242,7 @@ def check_case_data() -> Tuple[bool, List[str]]:
     can drift from each other; this checks they have not."""
     import csv as _csv
     import json as _json
-    from omr_shift import ResponseSheet
+    from omr_registration_audit import ResponseSheet
 
     root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     ref = ResponseSheet.from_file(os.path.join(root, "data", "answers.json"))

@@ -62,8 +62,6 @@ import random
 from dataclasses import dataclass, field, replace
 from enum import Enum
 from functools import cached_property
-
-import provenance
 from typing import Dict, Iterable, List, Optional, Sequence, Tuple
 
 NEG_INF = float("-inf")
@@ -2693,8 +2691,23 @@ class CohortScreen:
 # of the formats in data/, and `CASE_SHEET` below is only the default argument
 # for this file's own demonstration run.
 
-CASE_SHEET = os.path.join(os.path.dirname(os.path.abspath(__file__)),
-                          "data", "answers.json")
+_PKG = os.path.dirname(os.path.abspath(__file__))
+_REPO = os.path.dirname(_PKG)
+# The case data ships with the repository, not with the installed package, so
+# this is None for a pip install and the loader says so plainly.
+CASE_SHEET = os.path.join(_REPO, "data", "answers.json")
+if not os.path.exists(CASE_SHEET):
+    CASE_SHEET = None
+
+
+def _prov():
+    """Repo-root provenance helper, imported lazily.
+
+    Only the result writers need it, and it lives outside the package,
+    so the installed library must not depend on it at import time.
+    """
+    import provenance
+    return provenance
 
 
 def load_case_records(path: str = CASE_SHEET) -> List[Dict]:
@@ -2729,7 +2742,9 @@ def demo_planted_shift(cfg: AdjudicationConfig, outdir: str) -> Adjudication:
 
 
 def main() -> None:
-    here = os.path.join(os.path.dirname(os.path.abspath(__file__)), "results")
+    # _REPO, not the package directory: results belong to the repository.
+    # After the move into omr_registration_audit/ this silently wrote into the package.
+    here = os.path.join(_REPO, "results")
     figdir = os.path.join(here, "figures")
     os.makedirs(figdir, exist_ok=True)
     cfg = AdjudicationConfig()
@@ -2751,8 +2766,8 @@ def main() -> None:
     text = rep.text_report()
     print("\n" + text)
 
-    provenance.write_text(os.path.join(here, "case_default_prior.txt"), text)
-    provenance.write_json(os.path.join(here, "case_detail.json"), rep.to_dict())
+    _prov().write_text(os.path.join(here, "case_default_prior.txt"), text)
+    _prov().write_json(os.path.join(here, "case_detail.json"), rep.to_dict())
 
     print("\nRendering figures ...")
     for p in Visualizer(adj, figdir).render_all():
@@ -2769,15 +2784,17 @@ def main() -> None:
     adj_b = Adjudicator(sheet, cfg_b).run(verbose=False)
     text_b = Reporter(adj_b).text_report()
     print(text_b)
-    provenance.write_text(os.path.join(here, "case_high_ability_prior.txt"), text_b)
-    Visualizer(adj_b, os.path.join(figdir, "brilliant_prior")).render_all()
+    _prov().write_text(os.path.join(here, "case_high_ability_prior.txt"), text_b)
+    # The high-ability variant keeps its written report, which carries the
+    # prior-sensitivity result. Its six figures duplicated the default
+    # run's and were a third of everything published about one sheet.
 
     # -- Run C: adversarial stress test ------------------------------------
     print("\nRunning gate stress test (this takes a minute) ...")
     stress = GateStressTest(sheet, cfg).run()
     stress_txt = GateStressTest.render(stress)
     print(stress_txt)
-    provenance.write_text(os.path.join(here, "gate_stress_test.txt"), stress_txt)
+    _prov().write_text(os.path.join(here, "gate_stress_test.txt"), stress_txt)
 
     # ---- positive control ------------------------------------------------
     print("\n" + "=" * 78)
@@ -2786,7 +2803,7 @@ def main() -> None:
     ctrl = demo_planted_shift(cfg, figdir)
     ctext = Reporter(ctrl).text_report()
     print(ctext)
-    provenance.write_text(os.path.join(here, "positive_control.txt"), ctext)
+    _prov().write_text(os.path.join(here, "positive_control.txt"), ctext)
     Visualizer(ctrl, os.path.join(figdir, "positive_control")).render_all()
 
     # ---- operating characteristics ---------------------------------------
@@ -2805,7 +2822,7 @@ def main() -> None:
     for k, v in s["power"].items():
         print(f"    {k:<24} {v:.3f}")
     print(f"\n  wrote {os.path.relpath(SyntheticValidator.plot(val, figdir), here)}")
-    provenance.write_json(os.path.join(here, "validation.json"), s)
+    _prov().write_json(os.path.join(here, "validation.json"), s)
 
     print("\nDone.")
 

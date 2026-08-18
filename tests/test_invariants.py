@@ -32,7 +32,7 @@ _ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if _ROOT not in sys.path:
     sys.path.insert(0, _ROOT)
 
-from omr_shift import (  # noqa: E402
+from omr_registration_audit import (  # noqa: E402
     AdjudicationConfig, Adjudicator, BandedPairHMM, Policy, ResponseSheet,
     ScoringModel,
 )

@@ -23,8 +23,8 @@ to have for the candidate's competence. Higher = a more forceful claim.
 ------------------------------------------------------------------------------
 PROVENANCE
 ------------------------------------------------------------------------------
-  code fingerprint : 303b77849003  (over 2 loaded modules)
-  commit           : 644ac3d
+  code fingerprint : 30f927da3390  (over 4 loaded modules)
+  commit           : f9a9c44
   python           : 3.14.3    numpy: 2.4.4
   Regenerating from unchanged code reproduces this file exactly;
   an empty `git diff` is the check. See REPRODUCE.md.

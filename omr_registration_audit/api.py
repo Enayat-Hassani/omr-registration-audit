@@ -3,34 +3,31 @@
 """
 Single-call interface to the detector.
 
-    from omr_api import adjudicate_sheet
+    from omr_registration_audit import adjudicate_sheet, screen_cohort
 
     result = adjudicate_sheet(key=[...], marks=[...], profile="balanced")
     print(result.summary())    # headline figures
     print(result.explain())    # gates, null models, per-question ledger
 
+    report = screen_cohort(sheets, q=0.05)   # a whole sitting
+
 `key` is indexed by question, `marks` by physical row; use None for a blank
 row. `profile` is "conservative", "balanced" or "sensitive".
 
-For the full narrative report, use `omr_shift.Reporter`.
+For the full narrative report, use `omr_registration_audit.Reporter`.
 """
 from __future__ import annotations
 
-import os
-import sys
 import warnings
 from dataclasses import replace
-from typing import Optional, Sequence
+from typing import Optional, Sequence, Tuple
 
-_ROOT = os.path.dirname(os.path.abspath(__file__))
-if _ROOT not in sys.path:
-    sys.path.insert(0, _ROOT)
-
-from omr_shift import (  # noqa: E402
-    Adjudication, AdjudicationConfig, Adjudicator, Policy, ResponseSheet,
+from .core import (
+    Adjudication, AdjudicationConfig, Adjudicator, CohortScreen, CohortReport,
+    Policy, ResponseSheet,
 )
 
-__all__ = ["adjudicate_sheet", "PROFILES"]
+__all__ = ["adjudicate_sheet", "screen_cohort", "PROFILES"]
 
 PROFILES = {p.label: p for p in Policy}
 
@@ -110,6 +107,63 @@ def adjudicate_sheet(key: Sequence[str],
     sheet = ResponseSheet(tuple(key), tuple(marks), candidate_id=candidate_id)
     return Adjudicator(sheet, cfg).run(n_permutations=pol.n_permutations,
                                        verbose=verbose)
+
+
+
+def screen_cohort(sheets: Sequence[Tuple[Sequence[str], Sequence[Optional[str]]]],
+                  q: float = 0.05,
+                  profile: str = "balanced",
+                  base_rate: float = 0.018,
+                  candidate_ids: Optional[Sequence[str]] = None,
+                  progress: bool = False) -> CohortReport:
+    """Screen a whole sitting, controlling the false discovery rate.
+
+    sheets          one (key, marks) pair per candidate
+    q               target false discovery rate across the sitting
+    profile         per-sheet acceptance profile
+    base_rate       expected share of sheets carrying a genuine slip
+    candidate_ids   labels for the report; defaults to positional ids
+    progress        print a line per sheet
+
+    Returns a `CohortReport`. Use `report.text()` for the summary.
+
+    The permutation draw count is derived from the cohort size, not from the
+    profile: the step-up threshold is q/m for the first discovery, and a
+    p-value cannot go below 1/(draws+1). Too few draws and the screen returns
+    nothing whatever the sheets contain. That derivation is why this function
+    exists rather than leaving callers to assemble it.
+
+    Cost grows with the cohort: a sitting of a few thousand needs tens of
+    thousands of draws per sheet. Early stopping keeps error-free sheets cheap,
+    but expect minutes to hours rather than seconds.
+    """
+    if profile not in PROFILES:
+        raise ValueError(
+            f"unknown profile {profile!r}. Choose one of {sorted(PROFILES)}.")
+    m = len(sheets)
+    if m == 0:
+        raise ValueError("no sheets to screen")
+
+    screen = CohortScreen(q=q, base_rate=base_rate)
+    draws = screen.draws_required(m, q)
+    screen.check_resolution(m, draws)
+
+    base = AdjudicationConfig()
+    pol = PROFILES[profile]
+    cfg = replace(base, permutation_alpha=pol.alpha, n_permutations=draws)
+
+    results = []
+    for i, (key, marks) in enumerate(sheets):
+        _check(key, marks, base.max_displacement)
+        sid = candidate_ids[i] if candidate_ids else f"sheet-{i + 1}"
+        sheet = ResponseSheet(tuple(key), tuple(marks), candidate_id=sid)
+        adj = Adjudicator(sheet, cfg).run(n_permutations=draws, verbose=False,
+                                          early_stop=True)
+        results.append((sid, adj.calibration["p_value"], adj.accepted))
+        if progress:
+            print(f"  {sid}: p={adj.calibration['p_value']:.5f} "
+                  f"gate={'pass' if adj.accepted else 'fail'}")
+    return screen.screen(results)
 
 
 _POINTER = "result.explain() for gate values, null models and the ledger."
@@ -206,7 +260,7 @@ Adjudication.explain = _explain
 
 
 if __name__ == "__main__":
-    from omr_shift import CASE_SHEET
+    from .core import CASE_SHEET
     s = ResponseSheet.from_file(CASE_SHEET)
     print(adjudicate_sheet(list(s.key), list(s.marks),
                            candidate_id="CASE").explain())

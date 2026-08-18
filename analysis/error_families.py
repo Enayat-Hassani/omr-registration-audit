@@ -6,7 +6,7 @@
  Testing every structured failure mode, displacement included
 ================================================================================
 
-`omr_shift.py` answers one question: "is this sheet DISPLACED?"
+The detector answers one question: "is this sheet DISPLACED?"
 That is a single member of a much larger family. This module asks the general
 question: **"is there ANY low-complexity mechanical transformation that explains
 this sheet better than 'the answers were wrong'?"**
@@ -17,7 +17,7 @@ Every mechanical error is a structured, low-description-length transformation of
 one of exactly two things:
 
     POSITION errors  -- WHERE a mark was recorded, not WHAT was marked.
-        displacement / row skip .......... omr_shift.py
+        displacement / row skip .......... the detector
         wrong shuffle map (booklet form) . a permutation of question order
         section misassignment ............ answers written in another
                                            subject's block of the sheet
@@ -54,7 +54,7 @@ Its limitation is equally clear: it says nothing about SYMBOL errors, which
 change the multiset by construction. Those are enumerated exhaustively instead
 (there are only 4! = 24 of them).
 
-Author: companion to omr_shift.py.
+Companion to the detector.
 ================================================================================
 """
 
@@ -110,7 +110,7 @@ class HypothesisResult:
 # Imported rather than reimplemented: a second copy drifted from the first and
 # kept the overflow the log-space version fixes.
 import provenance  # noqa: E402
-from omr_shift import binom_sf  # noqa: E402,F401
+from omr_registration_audit import binom_sf  # noqa: E402,F401
 
 
 def sidak(p: float, m: int) -> float:
@@ -436,7 +436,7 @@ def full_report(key, marks, options=("A", "B", "C", "D")) -> str:
 
 if __name__ == "__main__":
     _H = _HERE
-    from omr_shift import load_case_records
+    from omr_registration_audit import load_case_records
 
     _rec = load_case_records()
     key = [r["correct"] for r in _rec]

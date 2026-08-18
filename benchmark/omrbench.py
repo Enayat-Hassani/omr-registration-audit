@@ -83,7 +83,7 @@ for _p in (_HERE, _ROOT, os.path.join(_ROOT, "analysis")):
         sys.path.insert(0, _p)
 
 import provenance  # noqa: E402
-from omr_shift import (  # noqa: E402
+from omr_registration_audit import (  # noqa: E402
     AdjudicationConfig, Adjudicator, Alignment, BandedPairHMM,
     CoherenceScanStatistic, EvidenceEngine, ResponseSheet, ScoringModel,
     SegmentAnalyzer,

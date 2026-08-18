@@ -93,8 +93,8 @@ MECHANISM: early_full_shift
 ------------------------------------------------------------------------------
 PROVENANCE
 ------------------------------------------------------------------------------
-  code fingerprint : 2f692389f73c  (over 4 loaded modules)
-  commit           : 644ac3d
+  code fingerprint : b29ed4ab08b5  (over 6 loaded modules)
+  commit           : f9a9c44
   python           : 3.14.3    numpy: 2.4.4
   parameters       : sheets_per_cell=14
   Regenerating from unchanged code reproduces this file exactly;

@@ -16,7 +16,7 @@ answer and the mark the candidate made.
 | `correct_answer` | the answer key |
 | `student_answer` | the mark on the sheet |
 
-These files are the only copy. The detector holds no case data: `omr_shift.py`
+These files are the only copy. The detector holds no case data: the library
 reads a sheet through `ResponseSheet.from_file`, which accepts either format, and
 the module is general to any sheet in that shape. The two formats can drift from
 each other, so `benchmark/verify_corpus.py` checks they agree and exits non-zero

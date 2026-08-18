@@ -1,8 +1,8 @@
 {
   "_provenance": {
-    "code_fingerprint": "e6de1b8417d0",
-    "n_source_files": 3,
-    "commit": "644ac3d",
+    "code_fingerprint": "4dbf53420220",
+    "n_source_files": 5,
+    "commit": "f9a9c44",
     "code_committed": true,
     "python": "3.14.3",
     "numpy": "2.4.4",

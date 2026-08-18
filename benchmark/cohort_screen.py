@@ -34,7 +34,7 @@ for _p in (_ROOT, _HERE):
         sys.path.insert(0, _p)
 
 import provenance  # noqa: E402
-from omr_shift import (  # noqa: E402
+from omr_registration_audit import (  # noqa: E402
     AdjudicationConfig, Adjudicator, CohortScreen, ResponseSheet,
     clopper_pearson_upper,
 )

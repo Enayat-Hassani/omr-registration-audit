@@ -1,0 +1,39 @@
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "omr-registration-audit"
+version = "0.1.0"
+description = "Detecting row-shift registration errors in OMR answer sheets"
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "Apache-2.0" }
+authors = [{ name = "Enayat Hassani" }]
+keywords = ["omr", "optical-mark-recognition", "answer-sheet", "alignment",
+            "hidden-markov-model", "psychometrics", "examination"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3",
+    "Topic :: Scientific/Engineering :: Information Analysis",
+]
+
+# Detection and adjudication use the standard library only. numpy and
+# matplotlib are needed for the benchmarks and figures, not for the detector,
+# so they are optional rather than required.
+dependencies = []
+
+[project.optional-dependencies]
+benchmarks = ["numpy>=1.21", "matplotlib>=3.5", "pandas>=1.3"]
+
+[project.urls]
+Homepage = "https://github.com/Enayat-Hassani/omr-registration-audit"
+Repository = "https://github.com/Enayat-Hassani/omr-registration-audit"
+
+[tool.setuptools]
+# Only the library ships. `provenance.py`, `benchmark/`, `analysis/`,
+# `tools/` and `tests/` are repository infrastructure and stay out of the
+# installed distribution.
+packages = ["omr_registration_audit"]

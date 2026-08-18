@@ -83,8 +83,8 @@ no confirmed historical case exists to calibrate against.
 ------------------------------------------------------------------------------
 PROVENANCE
 ------------------------------------------------------------------------------
-  code fingerprint : fe4ad47ccbec  (over 3 loaded modules)
-  commit           : 644ac3d
+  code fingerprint : 39639a3cb6f6  (over 5 loaded modules)
+  commit           : f9a9c44
   python           : 3.14.3    numpy: 2.4.4
   parameters       : certify=1500, clean=300, shift=150
   Regenerating from unchanged code reproduces this file exactly;

@@ -38,8 +38,8 @@ AGAINST THE KNOWN TRUTH  --  available here, not on a real sitting
 ------------------------------------------------------------------------------
 PROVENANCE
 ------------------------------------------------------------------------------
-  code fingerprint : bd6690fa09fa  (over 3 loaded modules)
-  commit           : 644ac3d  (SOURCE HAD UNCOMMITTED CHANGES)
+  code fingerprint : e7368eca708f  (over 5 loaded modules)
+  commit           : f9a9c44
   python           : 3.14.3    numpy: 2.4.4
   parameters       : base_rate=0.018, length=46, q=0.05, sheets=4000
   Regenerating from unchanged code reproduces this file exactly;
