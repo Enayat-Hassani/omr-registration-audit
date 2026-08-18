@@ -10,6 +10,13 @@ All evaluation is synthetic. The repository contains one real disputed-sheet
 analysis, but it is a case study rather than validation data. No claim here
 establishes performance on a live examination.
 
+## Try it
+
+Run the detector on three sheets — one clean, one with a skipped bubble row, and
+one filled in by guessing — without installing anything:
+
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Enayat-Hassani/omr-registration-audit/blob/main/Try_it_in_Colab.ipynb)
+
 ## What the detector does
 
 The recommended method is a three-state pair hidden Markov model over possible
@@ -155,6 +162,8 @@ REPORT.md                technical report and evidence audit
 CASE_REPORT.md           motivating-sheet analysis
 ASSUMPTIONS.md           design assumptions and measured outcomes
 REPRODUCE.md             commands and reproducibility notes
+Try_it_in_Colab.ipynb    step-by-step demo: clean, shifted and guessed sheets
+Colab_demo.ipynb         full walkthrough of the project in a browser
 data/                    answer data and corpus descriptions
 omr_registration_audit/  the installable library (core, api)
 provenance.py            records what produced each results file
